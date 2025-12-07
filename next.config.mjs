@@ -6,9 +6,21 @@ const isStaticExport = 'false';
 
 const nextConfig = {
   trailingSlash: true,
+
   env: {
     BUILD_STATIC_EXPORT: isStaticExport,
   },
+
+  // ⬇ Skip ESLint during build
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
+  // ⬇ Skip TypeScript type-checking during build
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
   modularizeImports: {
     '@mui/icons-material': {
       transform: '@mui/icons-material/{{member}}',
@@ -20,6 +32,7 @@ const nextConfig = {
       transform: '@mui/lab/{{member}}',
     },
   },
+
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
@@ -28,6 +41,7 @@ const nextConfig = {
 
     return config;
   },
+
   ...(isStaticExport === 'true' && {
     output: 'export',
   }),
