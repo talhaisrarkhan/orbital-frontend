@@ -22,7 +22,7 @@ import { useSearchParams } from "next/navigation";
 import { io, Socket } from "socket.io-client";
 import VideoCallScreen, { Participant } from "./CallingUi";
 
-const backendDomain = "http://localhost:5000/signaling";
+const backendDomain = "https://orbital-backend-t61x.onrender.com/signaling";
 
 const peerConfiguration = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
