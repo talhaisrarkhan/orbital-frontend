@@ -3,7 +3,6 @@ import type { IChatParticipant } from 'src/types/chat';
 import { useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
@@ -41,18 +40,14 @@ export function ChatHeaderCompose({ contacts, onAddRecipients }: Props) {
 
       <Autocomplete
         sx={{ minWidth: { md: 320 }, flexGrow: { xs: 1, md: 'unset' } }}
-        multiple
-        limitTags={3}
         popupIcon={null}
-        defaultValue={[]}
-        disableCloseOnSelect
         noOptionsText={<SearchNotFound query={searchRecipients} />}
-        onChange={(event, newValue) => handleAddRecipients(newValue)}
+        onChange={(event, newValue) => handleAddRecipients(newValue ? [newValue] : [])}
         onInputChange={(event, newValue) => setSearchRecipients(newValue)}
         options={contacts}
         getOptionLabel={(recipient) => recipient.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
-        renderInput={(params) => <TextField {...params} placeholder="+ Recipients" />}
+        renderInput={(params) => <TextField {...params} placeholder="+ Select a recipient" />}
         renderOption={(props, recipient, { selected }) => (
           <li {...props} key={recipient.id}>
             <Box
@@ -93,18 +88,6 @@ export function ChatHeaderCompose({ contacts, onAddRecipients }: Props) {
             {recipient.name}
           </li>
         )}
-        renderTags={(selected, getTagProps) =>
-          selected.map((recipient, index) => (
-            <Chip
-              {...getTagProps({ index })}
-              key={recipient.id}
-              label={recipient.name}
-              avatar={<Avatar alt={recipient.name} src={recipient.avatarUrl} />}
-              size="small"
-              variant="soft"
-            />
-          ))
-        }
       />
     </>
   );

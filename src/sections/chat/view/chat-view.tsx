@@ -406,6 +406,25 @@ export function ChatView() {
                     onCancelEdit={handleCancelEdit}
                   />
                 </>
+              ) : recipients.length > 0 ? (
+                <>
+                  <Stack sx={{ flexGrow: 1, height: 1, alignItems: 'center', justifyContent: 'center' }}>
+                    <EmptyContent
+                      imgUrl="/assets/icons/empty/ic_content.svg"
+                      title="Start a conversation"
+                      description="Type a message to start chatting"
+                    />
+                  </Stack>
+
+                  <ChatMessageInput
+                    recipients={recipients}
+                    onAddRecipients={handleAddRecipients}
+                    selectedConversationId={selectedConversationId}
+                    disabled={false}
+                    onSendMessage={handleSendMessage}
+                    onMessageSent={handleMessageSent}
+                  />
+                </>
               ) : (
                 <Stack sx={{ flexGrow: 1, height: 1, alignItems: 'center', justifyContent: 'center' }}>
                   <EmptyContent
