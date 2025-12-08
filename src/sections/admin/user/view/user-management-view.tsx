@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
@@ -38,6 +38,7 @@ import {
 
 import type { IUserManagementItem, IUserTableFilters } from 'src/types/user-management';
 import { getUsers, deleteUser } from 'src/api/user-management';
+import { useAuthContext } from 'src/auth/hooks';
 
 import { UserManagementTableRow } from '../user-management-table-row';
 import { UserManagementTableToolbar } from '../user-management-table-toolbar';
@@ -57,6 +58,9 @@ const TABLE_HEAD = [
 
 export function UserManagementView() {
   const table = useTable();
+  const { user } = useAuthContext();
+
+  const isAdmin = useMemo(() => user?.role === 'admin', [user?.role]);
 
   const confirm = useBoolean();
   const newUserDialog = useBoolean();
@@ -136,22 +140,24 @@ export function UserManagementView() {
             { name: 'List' },
           ]}
           action={
-            <Stack direction="row" spacing={1}>
-              <Button
-                variant="outlined"
-                startIcon={<Iconify icon="eva:cloud-upload-fill" />}
-                onClick={uploadCsvDialog.onTrue}
-              >
-                Upload CSV
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<Iconify icon="mingcute:add-line" />}
-                onClick={newUserDialog.onTrue}
-              >
-                New User
-              </Button>
-            </Stack>
+            isAdmin ? (
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="outlined"
+                  startIcon={<Iconify icon="eva:cloud-upload-fill" />}
+                  onClick={uploadCsvDialog.onTrue}
+                >
+                  Upload CSV
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<Iconify icon="mingcute:add-line" />}
+                  onClick={newUserDialog.onTrue}
+                >
+                  New User
+                </Button>
+              </Stack>
+            ) : undefined
           }
           sx={{ mb: { xs: 3, md: 5 } }}
         />
@@ -213,6 +219,7 @@ export function UserManagementView() {
                         onSelectRow={() => table.onSelectRow(row.id.toString())}
                         onDeleteRow={() => handleDeleteRow(row.id)}
                         onEditRow={() => handleEditRow(row.id)}
+                        isAdmin={isAdmin}
                       />
                     ))}
 

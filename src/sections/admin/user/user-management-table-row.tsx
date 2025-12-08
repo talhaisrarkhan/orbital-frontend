@@ -25,9 +25,10 @@ type Props = {
   onSelectRow: VoidFunction;
   onDeleteRow: VoidFunction;
   onEditRow: VoidFunction;
+  isAdmin?: boolean;
 };
 
-export function UserManagementTableRow({ row, selected, onSelectRow, onDeleteRow, onEditRow }: Props) {
+export function UserManagementTableRow({ row, selected, onSelectRow, onDeleteRow, onEditRow, isAdmin = false }: Props) {
   const { name, email, role, isActive, profilePicture } = row;
 
   const confirm = useBoolean();
@@ -79,9 +80,11 @@ export function UserManagementTableRow({ row, selected, onSelectRow, onDeleteRow
         </TableCell>
 
         <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
-          <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
+          {isAdmin && (
+            <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
+              <Iconify icon="eva:more-vertical-fill" />
+            </IconButton>
+          )}
         </TableCell>
       </TableRow>
 

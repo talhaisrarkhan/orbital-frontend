@@ -35,6 +35,7 @@ type Props = {
   projectId: string;
   members: IProjectMember[];
   onUpdate: () => void;
+  canManageMembers?: boolean;
 };
 
 const ROLES: ProjectMemberRole[] = [
@@ -46,7 +47,7 @@ const ROLES: ProjectMemberRole[] = [
   'member',
 ];
 
-export function ProjectTeamView({ projectId, members, onUpdate }: Props) {
+export function ProjectTeamView({ projectId, members, onUpdate, canManageMembers = false }: Props) {
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
@@ -80,13 +81,15 @@ export function ProjectTeamView({ projectId, members, onUpdate }: Props) {
       <Card>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 3 }}>
           <Typography variant="h6">Team Members ({members.length})</Typography>
-          <Button
-            variant="contained"
-            startIcon={<Iconify icon="mingcute:add-line" />}
-            onClick={() => setOpenAddDialog(true)}
-          >
-            Add Member
-          </Button>
+          {canManageMembers && (
+            <Button
+              variant="contained"
+              startIcon={<Iconify icon="mingcute:add-line" />}
+              onClick={() => setOpenAddDialog(true)}
+            >
+              Add Member
+            </Button>
+          )}
         </Stack>
 
         <TableContainer sx={{ overflow: 'unset' }}>
@@ -98,7 +101,7 @@ export function ProjectTeamView({ projectId, members, onUpdate }: Props) {
                   <TableCell>Role</TableCell>
                   <TableCell>Joined At</TableCell>
                   <TableCell>Added By</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  {canManageMembers && <TableCell align="right">Actions</TableCell>}
                 </TableRow>
               </TableHead>
 
@@ -120,26 +123,34 @@ export function ProjectTeamView({ projectId, members, onUpdate }: Props) {
                     </TableCell>
 
                     <TableCell>
-                      <Select
-                        value={member.role}
-                        size="small"
-                        onChange={(e) => handleRoleChange(member.id, e.target.value)}
-                        sx={{
-                          minWidth: 140,
-                          '& .MuiSelect-select': {
-                            py: 1,
-                            pr: '24px !important',
-                            typography: 'subtitle2',
-                            textTransform: 'capitalize',
-                          },
-                        }}
-                      >
-                        {ROLES.map((role) => (
-                          <MenuItem key={role} value={role} sx={{ textTransform: 'capitalize' }}>
-                            {role.replace('_', ' ')}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                      {canManageMembers ? (
+                        <Select
+                          value={member.role}
+                          size="small"
+                          onChange={(e) => handleRoleChange(member.id, e.target.value)}
+                          sx={{
+                            minWidth: 140,
+                            '& .MuiSelect-select': {
+                              py: 1,
+                              pr: '24px !important',
+                              typography: 'subtitle2',
+                              textTransform: 'capitalize',
+                            },
+                          }}
+                        >
+                          {ROLES.map((role) => (
+                            <MenuItem key={role} value={role} sx={{ textTransform: 'capitalize' }}>
+                              {role.replace('_', ' ')}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      ) : (
+                        <Chip
+                          label={member.role.replace('_', ' ')}
+                          size="small"
+                          sx={{ textTransform: 'capitalize' }}
+                        />
+                      )}
                     </TableCell>
 
                     <TableCell>{fDate(member.joinedAt)}</TableCell>
@@ -154,13 +165,15 @@ export function ProjectTeamView({ projectId, members, onUpdate }: Props) {
                       )}
                     </TableCell>
 
-                    <TableCell align="right">
-                      <Tooltip title="Remove Member">
-                        <IconButton color="error" onClick={() => setConfirmDelete(member.id)}>
-                          <Iconify icon="solar:trash-bin-trash-bold" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
+                    {canManageMembers && (
+                      <TableCell align="right">
+                        <Tooltip title="Remove Member">
+                          <IconButton color="error" onClick={() => setConfirmDelete(member.id)}>
+                            <Iconify icon="solar:trash-bin-trash-bold" />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>

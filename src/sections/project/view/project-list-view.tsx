@@ -2,7 +2,7 @@
 
 import type { IProject } from 'src/types/project';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 
 import Box from '@mui/material/Box';
@@ -32,6 +32,7 @@ import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { ProjectDialog } from '../project-dialog';
 
 import { useSocketRoom } from 'src/hooks/use-socket';
+import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
 
@@ -56,6 +57,9 @@ export function ProjectListView() {
   const theme = useTheme();
   const router = useRouter();
   const [openDialog, setOpenDialog] = useState(false);
+  const { user } = useAuthContext();
+
+  const isAdmin = useMemo(() => user?.role === 'admin', [user?.role]);
 
   const { data: projects, isLoading, mutate } = useSWR<IProject[]>(
     endpoints.project.list,
@@ -112,13 +116,15 @@ export function ProjectListView() {
           { name: 'Projects' },
         ]}
         action={
-          <Button
-            variant="contained"
-            startIcon={<Iconify icon="mingcute:add-line" />}
-            onClick={handleOpenDialog}
-          >
-            New Project
-          </Button>
+          isAdmin ? (
+            <Button
+              variant="contained"
+              startIcon={<Iconify icon="mingcute:add-line" />}
+              onClick={handleOpenDialog}
+            >
+              New Project
+            </Button>
+          ) : undefined
         }
         sx={{ mb: { xs: 3, md: 5 } }}
       />
@@ -134,15 +140,17 @@ export function ProjectListView() {
         <EmptyContent
           filled
           title="No Projects Yet"
-          description="Get started by creating your first project"
+          description={isAdmin ? "Get started by creating your first project" : "No projects available"}
           action={
-            <Button
-              variant="contained"
-              startIcon={<Iconify icon="mingcute:add-line" />}
-              onClick={handleOpenDialog}
-            >
-              Create Project
-            </Button>
+            isAdmin ? (
+              <Button
+                variant="contained"
+                startIcon={<Iconify icon="mingcute:add-line" />}
+                onClick={handleOpenDialog}
+              >
+                Create Project
+              </Button>
+            ) : undefined
           }
           sx={{ py: 10 }}
         />

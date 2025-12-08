@@ -83,9 +83,10 @@ type ColumnProps = {
     sprintId: string;
   onUpdate?: () => void;
   canCreateTask?: boolean;
+  canManageColumn?: boolean;
 };
 
-export function KanbanColumn({ column, tasks, disabled, sx, children, projectId, sprintId, onUpdate, canCreateTask }: ColumnProps) {
+export function KanbanColumn({ column, tasks, disabled, sx, children, projectId, sprintId, onUpdate, canCreateTask, canManageColumn = false }: ColumnProps) {
   const [openAddTask, setOpenAddTask] = useState(false);
   const [openEditColumn, setOpenEditColumn] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -194,9 +195,11 @@ export function KanbanColumn({ column, tasks, disabled, sx, children, projectId,
                     <Iconify icon="mingcute:add-line" width={18} />
                   </IconButton>
                 )}
-                <IconButton size="small" onClick={handleOpenMenu}>
-                  <Iconify icon="eva:more-vertical-fill" width={18} />
-                </IconButton>
+                {canManageColumn && (
+                  <IconButton size="small" onClick={handleOpenMenu}>
+                    <Iconify icon="eva:more-vertical-fill" width={18} />
+                  </IconButton>
+                )}
               </Stack>
             </Stack>
           ),
@@ -234,33 +237,35 @@ export function KanbanColumn({ column, tasks, disabled, sx, children, projectId,
         columnId={column.id}
       />
 
-      {/* Column Menu */}
-      <Menu
-        anchorEl={menuAnchor}
-        open={Boolean(menuAnchor)}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <MenuItem onClick={handleEditColumn}>
-          <ListItemIcon>
-            <Iconify icon="solar:pen-bold" width={20} />
-          </ListItemIcon>
-          <ListItemText>Edit Column</ListItemText>
-        </MenuItem>
-        <MenuItem 
-          onClick={() => {
-            setConfirmDelete(true);
-            handleCloseMenu();
-          }}
-          sx={{ color: 'error.main' }}
+      {/* Column Menu - Only shown if user can manage columns */}
+      {canManageColumn && (
+        <Menu
+          anchorEl={menuAnchor}
+          open={Boolean(menuAnchor)}
+          onClose={handleCloseMenu}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <ListItemIcon>
-            <Iconify icon="solar:trash-bin-trash-bold" width={20} sx={{ color: 'error.main' }} />
-          </ListItemIcon>
-          <ListItemText>Delete Column</ListItemText>
-        </MenuItem>
-      </Menu>
+          <MenuItem onClick={handleEditColumn}>
+            <ListItemIcon>
+              <Iconify icon="solar:pen-bold" width={20} />
+            </ListItemIcon>
+            <ListItemText>Edit Column</ListItemText>
+          </MenuItem>
+          <MenuItem 
+            onClick={() => {
+              setConfirmDelete(true);
+              handleCloseMenu();
+            }}
+            sx={{ color: 'error.main' }}
+          >
+            <ListItemIcon>
+              <Iconify icon="solar:trash-bin-trash-bold" width={20} sx={{ color: 'error.main' }} />
+            </ListItemIcon>
+            <ListItemText>Delete Column</ListItemText>
+          </MenuItem>
+        </Menu>
+      )}
 
       {/* Edit Column Dialog */}
       <ColumnDialog

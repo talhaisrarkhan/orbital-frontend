@@ -137,15 +137,8 @@ export function JwtSignInView() {
     <>
       <FormHead
         title="Sign in to your account"
-        description={
-          <>
-            {`Don’t have an account? `}
-            <Link component={RouterLink} href={paths.auth.jwt.signUp} variant="subtitle2">
-              Get started
-            </Link>
-          </>
-        }
-        sx={{ textAlign: { xs: 'center', md: 'left' } }}
+      
+        
       />
 
       <Alert severity="info" sx={{ mb: 3 }}>

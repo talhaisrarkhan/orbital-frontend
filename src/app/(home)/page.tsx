@@ -1,13 +1,31 @@
-import { HomeView } from 'src/sections/home/view';
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // ----------------------------------------------------------------------
 
-export const metadata = {
-  title: 'Minimals UI: The starting point for your next project',
-  description:
-    'The starting point for your next project with Minimal UI Kit, built on the newest version of Material-UI ©, ready to be customized to your style',
-};
-
 export default function Page() {
-  return <HomeView />;
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace('/auth/jwt/sign-in');
+  }, [router]);
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        width: '100%',
+      }}
+    >
+      <CircularProgress size={48} />
+    </Box>
+  );
 }

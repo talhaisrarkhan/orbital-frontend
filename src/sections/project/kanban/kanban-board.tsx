@@ -387,6 +387,7 @@ export function KanbanBoard({ boardId, projectId, sprintId, projectManagerId }: 
                 tasks={tasks[column.id] || []}
                 onUpdate={mutateBoard}
                 canCreateTask={canManageTasks}
+                canManageColumn={canManageSprint}
               >
                 <SortableContext
                   items={tasks[column.id] || []}

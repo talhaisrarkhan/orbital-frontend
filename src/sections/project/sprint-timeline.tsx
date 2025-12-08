@@ -31,9 +31,10 @@ type Props = {
   sprints: ISprint[];
   onViewSprint: (sprintId: string) => void;
   onRefresh: () => void;
+  canManageSprint?: boolean;
 };
 
-export function SprintTimeline({ sprints, onViewSprint, onRefresh }: Props) {
+export function SprintTimeline({ sprints, onViewSprint, onRefresh, canManageSprint = false }: Props) {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedSprint, setSelectedSprint] = useState<ISprint | null>(null);
@@ -130,6 +131,7 @@ export function SprintTimeline({ sprints, onViewSprint, onRefresh }: Props) {
             onMenu={(e) => handleOpenMenu(e, activeSprint)}
             progress={getSprintProgress(activeSprint)}
             daysRemaining={getSprintDaysRemaining(activeSprint)}
+            canManageSprint={canManageSprint}
           />
         </Box>
       )}
@@ -150,6 +152,7 @@ export function SprintTimeline({ sprints, onViewSprint, onRefresh }: Props) {
                 onView={() => onViewSprint(sprint.id)}
                 onMenu={(e) => handleOpenMenu(e, sprint)}
                 progress={getSprintProgress(sprint)}
+                canManageSprint={canManageSprint}
               />
             ))}
           </Stack>
@@ -172,38 +175,41 @@ export function SprintTimeline({ sprints, onViewSprint, onRefresh }: Props) {
                 onView={() => onViewSprint(sprint.id)}
                 onMenu={(e) => handleOpenMenu(e, sprint)}
                 progress={getSprintProgress(sprint)}
+                canManageSprint={canManageSprint}
               />
             ))}
           </Stack>
         </Box>
       )}
 
-      {/* Context Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleCloseMenu}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-      >
-        {selectedSprint && !selectedSprint.isActive && !selectedSprint.isCompleted && (
-          <MenuItem onClick={handleActivateSprint}>
-            <Iconify icon="solar:play-bold-duotone" sx={{ mr: 1 }} />
-            Activate Sprint
+      {/* Context Menu - Only shown if user can manage sprints */}
+      {canManageSprint && (
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleCloseMenu}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+          {selectedSprint && !selectedSprint.isActive && !selectedSprint.isCompleted && (
+            <MenuItem onClick={handleActivateSprint}>
+              <Iconify icon="solar:play-bold-duotone" sx={{ mr: 1 }} />
+              Activate Sprint
+            </MenuItem>
+          )}
+          {selectedSprint && selectedSprint.isActive && (
+            <MenuItem onClick={handleCompleteSprint}>
+              <Iconify icon="solar:check-circle-bold-duotone" sx={{ mr: 1 }} />
+              Complete Sprint
+            </MenuItem>
+          )}
+          <Divider />
+          <MenuItem onClick={handleDeleteSprint} sx={{ color: 'error.main' }}>
+            <Iconify icon="solar:trash-bin-trash-bold-duotone" sx={{ mr: 1 }} />
+            Delete Sprint
           </MenuItem>
-        )}
-        {selectedSprint && selectedSprint.isActive && (
-          <MenuItem onClick={handleCompleteSprint}>
-            <Iconify icon="solar:check-circle-bold-duotone" sx={{ mr: 1 }} />
-            Complete Sprint
-          </MenuItem>
-        )}
-        <Divider />
-        <MenuItem onClick={handleDeleteSprint} sx={{ color: 'error.main' }}>
-          <Iconify icon="solar:trash-bin-trash-bold-duotone" sx={{ mr: 1 }} />
-          Delete Sprint
-        </MenuItem>
-      </Menu>
+        </Menu>
+      )}
     </Stack>
   );
 }
@@ -217,9 +223,10 @@ type SprintCardProps = {
   onMenu: (event: React.MouseEvent<HTMLElement>) => void;
   progress: number;
   daysRemaining?: number;
+  canManageSprint?: boolean;
 };
 
-function SprintCard({ sprint, variant, onView, onMenu, progress, daysRemaining }: SprintCardProps) {
+function SprintCard({ sprint, variant, onView, onMenu, progress, daysRemaining, canManageSprint = false }: SprintCardProps) {
   const theme = useTheme();
 
   const variantConfig = {
@@ -287,9 +294,11 @@ function SprintCard({ sprint, variant, onView, onMenu, progress, daysRemaining }
               </Typography>
             )}
           </Box>
-          <IconButton size="small" onClick={onMenu}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
+          {canManageSprint && (
+            <IconButton size="small" onClick={onMenu}>
+              <Iconify icon="eva:more-vertical-fill" />
+            </IconButton>
+          )}
         </Stack>
 
         {/* Dates */}

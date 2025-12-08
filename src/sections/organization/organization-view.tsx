@@ -3,7 +3,7 @@
 import type { IDepartment } from 'src/types/department';
 import type { ITeam } from 'src/types/team';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -32,6 +32,8 @@ import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
 import { paths } from 'src/routes/paths';
 
+import { useAuthContext } from 'src/auth/hooks';
+
 import { DepartmentDialog } from './department-dialog';
 import { TeamDialog } from './team-dialog';
 
@@ -44,6 +46,7 @@ type DepartmentCardProps = {
   onCreateTeam: (departmentId: string) => void;
   onEditTeam: (team: ITeam) => void;
   onDeleteTeam: (id: string) => void;
+  isAdmin?: boolean;
 };
 
 function DepartmentCard({
@@ -53,6 +56,7 @@ function DepartmentCard({
   onCreateTeam,
   onEditTeam,
   onDeleteTeam,
+  isAdmin = false,
 }: DepartmentCardProps) {
   // Use teams from the department object (already fetched with departments)
   const departmentTeams = department.teams || [];
@@ -112,33 +116,35 @@ function DepartmentCard({
           </Box>
         </Stack>
 
-        <Stack direction="row" spacing={1}>
-          <IconButton
-            size="small"
-            onClick={() => onEditDepartment(department)}
-            sx={{
-              bgcolor: (theme) => alpha(theme.palette.grey[500], 0.08),
-              '&:hover': {
-                bgcolor: (theme) => alpha(theme.palette.grey[500], 0.16),
-              },
-            }}
-          >
-            <Iconify icon="solar:pen-bold" width={18} />
-          </IconButton>
-          <IconButton
-            size="small"
-            onClick={() => onDeleteDepartment(department.id)}
-            sx={{
-              bgcolor: (theme) => alpha(theme.palette.error.main, 0.08),
-              color: 'error.main',
-              '&:hover': {
-                bgcolor: (theme) => alpha(theme.palette.error.main, 0.16),
-              },
-            }}
-          >
-            <Iconify icon="solar:trash-bin-trash-bold" width={18} />
-          </IconButton>
-        </Stack>
+        {isAdmin && (
+          <Stack direction="row" spacing={1}>
+            <IconButton
+              size="small"
+              onClick={() => onEditDepartment(department)}
+              sx={{
+                bgcolor: (theme) => alpha(theme.palette.grey[500], 0.08),
+                '&:hover': {
+                  bgcolor: (theme) => alpha(theme.palette.grey[500], 0.16),
+                },
+              }}
+            >
+              <Iconify icon="solar:pen-bold" width={18} />
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={() => onDeleteDepartment(department.id)}
+              sx={{
+                bgcolor: (theme) => alpha(theme.palette.error.main, 0.08),
+                color: 'error.main',
+                '&:hover': {
+                  bgcolor: (theme) => alpha(theme.palette.error.main, 0.16),
+                },
+              }}
+            >
+              <Iconify icon="solar:trash-bin-trash-bold" width={18} />
+            </IconButton>
+          </Stack>
+        )}
       </Stack>
 
       {/* Teams Section */}
@@ -155,14 +161,16 @@ function DepartmentCard({
               Teams ({departmentTeams.length})
             </Typography>
           </Stack>
-          <Button
-            size="small"
-            variant="soft"
-            startIcon={<Iconify icon="mingcute:add-line" />}
-            onClick={() => onCreateTeam(department.id)}
-          >
-            Add Team
-          </Button>
+          {isAdmin && (
+            <Button
+              size="small"
+              variant="soft"
+              startIcon={<Iconify icon="mingcute:add-line" />}
+              onClick={() => onCreateTeam(department.id)}
+            >
+              Add Team
+            </Button>
+          )}
         </Stack>
 
         {departmentTeams.length === 0 ? (
@@ -222,26 +230,28 @@ function DepartmentCard({
                           }}
                         />
                       </Box>
-                      <Stack direction="row" spacing={0.5}>
-                        <IconButton
-                          size="small"
-                          onClick={() => onEditTeam(team)}
-                          sx={{ width: 28, height: 28 }}
-                        >
-                          <Iconify icon="solar:pen-bold" width={16} />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => onDeleteTeam(team.id)}
-                          sx={{
-                            width: 28,
-                            height: 28,
-                            color: 'error.main',
-                          }}
-                        >
-                          <Iconify icon="solar:trash-bin-trash-bold" width={16} />
-                        </IconButton>
-                      </Stack>
+                      {isAdmin && (
+                        <Stack direction="row" spacing={0.5}>
+                          <IconButton
+                            size="small"
+                            onClick={() => onEditTeam(team)}
+                            sx={{ width: 28, height: 28 }}
+                          >
+                            <Iconify icon="solar:pen-bold" width={16} />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => onDeleteTeam(team.id)}
+                            sx={{
+                              width: 28,
+                              height: 28,
+                              color: 'error.main',
+                            }}
+                          >
+                            <Iconify icon="solar:trash-bin-trash-bold" width={16} />
+                          </IconButton>
+                        </Stack>
+                      )}
                     </Stack>
 
                     {/* Team Lead */}
@@ -299,6 +309,9 @@ function DepartmentCard({
 
 export function OrganizationView() {
   const { departments, departmentsLoading } = useGetDepartments();
+  const { user } = useAuthContext();
+
+  const isAdmin = useMemo(() => user?.role === 'admin', [user?.role]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
@@ -398,22 +411,24 @@ export function OrganizationView() {
             sx={{ maxWidth: { sm: 320 } }}
           />
 
-          <Stack direction="row" spacing={2}>
-            <Button
-              variant="outlined"
-              startIcon={<Iconify icon="mingcute:add-line" />}
-              onClick={() => handleCreateTeam()}
-            >
-              New Team
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<Iconify icon="mingcute:add-line" />}
-              onClick={handleCreateDepartment}
-            >
-              New Department
-            </Button>
-          </Stack>
+          {isAdmin && (
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="outlined"
+                startIcon={<Iconify icon="mingcute:add-line" />}
+                onClick={() => handleCreateTeam()}
+              >
+                New Team
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<Iconify icon="mingcute:add-line" />}
+                onClick={handleCreateDepartment}
+              >
+                New Department
+              </Button>
+            </Stack>
+          )}
         </Stack>
 
         {/* Departments Grid */}
@@ -438,9 +453,11 @@ export function OrganizationView() {
             <Typography variant="body2" color="text.disabled" sx={{ mb: 3 }}>
               Create your first department to get started
             </Typography>
-            <Button variant="contained" onClick={handleCreateDepartment}>
-              Create Department
-            </Button>
+            {isAdmin && (
+              <Button variant="contained" onClick={handleCreateDepartment}>
+                Create Department
+              </Button>
+            )}
           </Card>
         ) : (
           <Stack spacing={4}>
@@ -453,6 +470,7 @@ export function OrganizationView() {
                 onCreateTeam={handleCreateTeam}
                 onEditTeam={handleEditTeam}
                 onDeleteTeam={(id) => handleDeleteClick('team', id)}
+                isAdmin={isAdmin}
               />
             ))}
           </Stack>

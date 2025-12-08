@@ -182,7 +182,7 @@ export function ProjectDialog({ open, onClose, project, companyId }: Props) {
             </Grid>
 
             <Field.Select name="projectManagerId" label="Project Manager">
-              {users?.map((user) => (
+              {users?.filter((user) => user.role === 'departmentHead')?.map((user) => (
                 <MenuItem key={user.id} value={user.id.toString()}>
                   {user.name} ({user.email})
                 </MenuItem>

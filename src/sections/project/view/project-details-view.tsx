@@ -360,6 +360,7 @@ export function ProjectDetailsView({ projectId }: Props) {
           sprints={sprints || []}
           onViewSprint={handleViewSprint}
           onRefresh={mutateSprints}
+          canManageSprint={canManageSprint}
         />
       )}
 
@@ -383,6 +384,7 @@ export function ProjectDetailsView({ projectId }: Props) {
           projectId={projectId}
           members={project.members || []}
           onUpdate={() => mutateProject()}
+          canManageMembers={canManageSprint}
         />
       )}
 
